@@ -1,0 +1,7 @@
+{
+  "name": "Vebp",
+  "venv": ".venv",
+  "script": {
+    "build": "run Vebp/run.py build"
+  }
+}
