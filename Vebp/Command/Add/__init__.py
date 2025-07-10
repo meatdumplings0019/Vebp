@@ -100,3 +100,9 @@
         clean_parser = subparsers.add_parser(
             "clean"
         )
+
+    @staticmethod
+    def add_cwd_command(subparsers) -> None:
+        cwd_parser = subparsers.add_parser(
+            "cwd"
+        )

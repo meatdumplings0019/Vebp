@@ -2,6 +2,7 @@ from colorama import Fore
 
 from Vebp.Command.Builder import CommandBuild
 from Vebp.Command.Clean import CommandClean
+from Vebp.Command.Cwd import CommandCwd
 from Vebp.Command.Dev import CommandDev
 from Vebp.Command.Exit import CommandExit
 from Vebp.Command.Init import CommandInit
@@ -33,5 +34,7 @@ class CommandMatch:
                 CommandExit.handle()
             case "clean":
                 CommandClean.handle()
+            case "cwd":
+                CommandCwd.handle()
             case others:
                 print(f"{Fore.RED}{others} dont have.")
