@@ -10,5 +10,3 @@ class VebpBase:
         if p_lst:
             for p in p_lst:
                 get_plugin_manager().load_plugin(p)
-
-        print()

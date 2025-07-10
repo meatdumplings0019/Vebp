@@ -17,12 +17,15 @@ class CMD(VebpBase):
     def run(self) -> None:
         print(f"Vebp {__version__}")
         print('Type "help", "copyright", "credits" or "license" for more information.')
+        print()
 
         while True:
             try:
-                file = input(f"{Fore.MAGENTA}>>> ")
+                print(f"{Fore.MAGENTA}>>> ", end="")
+                print(Style.RESET_ALL, end="")
+                file = input()
                 print(Style.RESET_ALL, end="")
                 CommandMatch.handle(ArgsUtil.parse_input_args(file, self.parser))
             except Exception as e:
                 print(Style.RESET_ALL, end="")
-                print(e, file=sys.stderr)
+                print(f"{Fore.RED}{e}")

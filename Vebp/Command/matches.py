@@ -1,4 +1,4 @@
-import sys
+from colorama import Fore
 
 from Vebp.Command.Builder import CommandBuild
 from Vebp.Command.Clean import CommandClean
@@ -13,8 +13,10 @@ from Vebp.Command.Plugin import CommandPlugin
 class CommandMatch:
     @staticmethod
     def handle(parsed_args) -> None:
+        command = getattr(parsed_args, "command", None)
+
         # noinspection PyUnreachableCode
-        match parsed_args.command:
+        match command:
             case 'build':
                 CommandBuild.handle(parsed_args)
             case 'init':
@@ -32,4 +34,4 @@ class CommandMatch:
             case "clean":
                 CommandClean.handle()
             case others:
-                print(f"{others} dont have.", file=sys.stderr)
+                print(f"{Fore.RED}{others} dont have.")
