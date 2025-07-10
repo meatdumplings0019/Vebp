@@ -1,4 +1,4 @@
 {
-  "main": "Vebp/run.py",
+  "main": "vebp/run.py",
   "console": true
 }
