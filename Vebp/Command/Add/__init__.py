@@ -92,17 +92,17 @@
     @staticmethod
     def add_exit_command(subparsers) -> None:
         exit_parser = subparsers.add_parser(
-            "exit"
+            "exit", help="👉 CMD退出命令"
         )
 
     @staticmethod
     def add_clean_command(subparsers) -> None:
         clean_parser = subparsers.add_parser(
-            "clean"
+            "clean", help="🧹 清理构建目录"
         )
 
     @staticmethod
     def add_cwd_command(subparsers) -> None:
         cwd_parser = subparsers.add_parser(
-            "cwd"
+            "cwd", help='ℹ️ 显示CWD路径'
         )
