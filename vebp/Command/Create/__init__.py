@@ -1,5 +1,6 @@
 ﻿import argparse
 from vebp.Command.Add import CommandAdd
+from vebp.version import __version__
 
 class CommandCreate:
     @staticmethod
@@ -16,10 +17,14 @@ class CommandCreate:
               🔨 vebp build App -s app.py --in_asset "templates;ui" --asset "README.md"
               🔨 vebp build  # 使用 vebp-build.json 中的配置
               📦 vebp package # 显示 package 配置
-            ''')
+            ''',
+            add_help=False
+        )
 
-        parser.add_argument('--version', '-v', action='store_true',
-                            help='ℹ️ 显示版本信息')
+        parser.add_argument('--help', '-h', action='help',
+                            help='ℹ️ 显示帮助信息', default=argparse.SUPPRESS)
+        parser.add_argument('--version', '-v', action='version',
+                            help='ℹ️ 显示版本信息', version=f"Vebp {__version__}")
 
         subparsers = parser.add_subparsers(
             title='📋 可用命令',
