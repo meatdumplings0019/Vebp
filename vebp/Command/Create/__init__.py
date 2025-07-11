@@ -1,12 +1,13 @@
 ﻿import argparse
+
+from vebp.Command import Command
 from vebp.Command.Add import CommandAdd
 from vebp.Command.Version import CommandVersion
-from vebp.version import __version__
 
 class CommandCreate:
     @staticmethod
     def create() -> argparse.ArgumentParser:
-        parser = argparse.ArgumentParser(
+        parser = Command(
             description='🚀 vebp - 增强的 PyInstaller 打包工具',
             formatter_class=argparse.RawDescriptionHelpFormatter,
             epilog='''示例:
@@ -19,7 +20,8 @@ class CommandCreate:
               🔨 vebp build  # 使用 vebp-build.json 中的配置
               📦 vebp package # 显示 package 配置
             ''',
-            add_help=False
+            add_help=False,
+
         )
 
         parser.add_argument('--help', '-h', action='help',

@@ -1,5 +1,7 @@
 ﻿import sys
 
+from colorama import Fore
+
 from vebp.Libs.Error import get_traceback
 from vebp.cli import CLI
 
@@ -9,7 +11,7 @@ def launch(func):
         try:
             return func(*args, **kwargs)
         except Exception as e:
-            print(f"{e}: {get_traceback(e)}", file=sys.stderr)
+            print(f"{Fore.RED}{e}: {get_traceback(e)}", file=sys.stderr)
             sys.exit(1)
 
     return wrapper
