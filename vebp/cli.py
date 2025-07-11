@@ -17,4 +17,4 @@ class CLI(VebpBase):
             cmd.run()
             sys.exit(0)
 
-        CommandMatch.handle(self.parser.parse_args(args))
+        CommandMatch.handle(self.parser)

@@ -3,6 +3,8 @@ from vebp.Data.BuildConfig import BuildConfig
 from vebp.Data.Config import Config
 from vebp.Data.Pack import Pack
 from vebp.Data.Package import Package
+from vebp.Libs.File import FileStream
+from vebp.path import gitignore_path
 
 
 class CommandInit:
@@ -10,12 +12,14 @@ class CommandInit:
     def handle(args) -> bool:
         print("🛠️ 正在初始化 VEBP 项目...")
 
-        path = getattr(args, 'path', "../../Cli")
+        path = getattr(args, 'path', Path.cwd())
         project_name = Path.cwd().name
 
         package_success = Package.create(path, args.force)
         build_success = BuildConfig.create(path, args.force)
         config_success = Config.create(path, args.force)
+
+        FileStream.copy(gitignore_path, path)
 
         if args.pack:
             print("📦 创建打包配置文件...")

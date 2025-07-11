@@ -1,5 +1,6 @@
 ﻿import argparse
 from vebp.Command.Add import CommandAdd
+from vebp.Command.Version import CommandVersion
 from vebp.version import __version__
 
 class CommandCreate:
@@ -24,7 +25,7 @@ class CommandCreate:
         parser.add_argument('--help', '-h', action='help',
                             help='ℹ️ 显示帮助信息', default=argparse.SUPPRESS)
         parser.add_argument('--version', '-v', action='version',
-                            help='ℹ️ 显示版本信息', version=f"Vebp {__version__}")
+                            help='ℹ️ 显示版本信息', version=CommandVersion.get_value())
 
         subparsers = parser.add_subparsers(
             title='📋 可用命令',
@@ -41,5 +42,7 @@ class CommandCreate:
         CommandAdd.add_exit_command(subparsers)
         CommandAdd.add_clean_command(subparsers)
         CommandAdd.add_cwd_command(subparsers)
+        CommandAdd.add_help_command(subparsers)
+        CommandAdd.add_version_command(subparsers)
 
         return parser

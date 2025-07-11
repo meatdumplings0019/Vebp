@@ -186,7 +186,11 @@ class Builder(BaseBuilder):
             for source in sources:
                 abs_source = source.resolve()
 
-                arg = f"{abs_source}{separator}{Path(target_relative) / source}"
+                out = Path(target_relative)
+
+                if source.is_dir():
+                    out /= source
+                arg = f"{abs_source}{separator}{out}"
                 add_data_args.extend(["--add-data", arg])
 
         return add_data_args

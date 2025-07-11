@@ -1,12 +1,9 @@
-﻿import sys
+﻿from colorama import Fore, Style
 
-from colorama import Fore, Style
-
-from vebp.Libs.Args import ArgsUtil
 from vebp.Command.Create import CommandCreate
 from vebp.Command.matches import CommandMatch
-from vebp.version import __version__
 from vebp.base import VebpBase
+from vebp.version import __version__
 
 
 class CMD(VebpBase):
@@ -16,7 +13,7 @@ class CMD(VebpBase):
 
     def run(self) -> None:
         print(f"Vebp {__version__}")
-        print('Type "help", "copyright", "credits" or "license" for more information.')
+        print('Type "help", "version", "copyright", "credits" or "license" for more information.')
         print()
 
         while True:
@@ -25,7 +22,7 @@ class CMD(VebpBase):
                 print(Style.RESET_ALL, end="")
                 file = input()
                 print(Style.RESET_ALL, end="")
-                CommandMatch.handle(ArgsUtil.parse_input_args(file, self.parser))
+                CommandMatch.handle(self.parser, 1, file)
             except Exception as e:
                 print(Style.RESET_ALL, end="")
                 print(f"{Fore.RED}{e}")

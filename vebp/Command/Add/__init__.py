@@ -106,3 +106,15 @@
         cwd_parser = subparsers.add_parser(
             "cwd", help='ℹ️ 显示CWD路径'
         )
+
+    @staticmethod
+    def add_help_command(subparsers) -> None:
+        help_parser = subparsers.add_parser(
+            "help", help='ℹ️ 显示帮助信息'
+        )
+
+    @staticmethod
+    def add_version_command(subparsers) -> None:
+        version_parser = subparsers.add_parser(
+            "version", help="ℹ️ 显示版本信息"
+        )

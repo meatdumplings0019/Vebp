@@ -8,5 +8,4 @@ import vebp.cli
 import vebp.cmd
 import vebp.fstr
 import vebp.lancher
-import vebp.run
 import vebp.version

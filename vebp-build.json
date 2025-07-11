@@ -1,4 +1,10 @@
 {
-  "main": "vebp/run.py",
-  "console": true
+  "main": "run.py",
+  "console": true,
+  "in_assets": [
+    {
+      "from": [".gitignore"],
+      "to": "."
+    }
+  ]
 }
