@@ -1,4 +1,7 @@
-﻿class CommandAdd:
+﻿from pygments.lexer import default
+
+
+class CommandAdd:
     @staticmethod
     def add_build_command(subparsers) -> None:
         build_parser = subparsers.add_parser(
@@ -118,3 +121,11 @@
         version_parser = subparsers.add_parser(
             "version", help="ℹ️ 显示版本信息"
         )
+
+    @staticmethod
+    def add_create_command(subparsers) -> None:
+        create_parser = subparsers.add_parser(
+            "create", help="🚀 创建便携包"
+        )
+
+        create_parser.add_argument("name", help="📦 使用的包模板", default=None)

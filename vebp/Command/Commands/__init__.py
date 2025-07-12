@@ -1,0 +1,13 @@
+﻿import vebp.Command.Commands.Builder
+import vebp.Command.Commands.Clean
+import vebp.Command.Commands.Create
+import vebp.Command.Commands.Cwd
+import vebp.Command.Commands.Dev
+import vebp.Command.Commands.Exit
+import vebp.Command.Commands.Help
+import vebp.Command.Commands.Init
+import vebp.Command.Commands.Pack
+import vebp.Command.Commands.Package
+import vebp.Command.Commands.Plugin
+import vebp.Command.Commands.Version
+import vebp.Command.Commands.matches

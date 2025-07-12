@@ -2,7 +2,7 @@
 import sys
 from vebp.Libs.File.path import MPath_
 from vebp.Data.Package import Package
-from vebp.Command.Dev.mapper import CommandMapper
+from vebp.Command.Commands.Dev.mapper import CommandMapper
 
 
 class CommandDev:

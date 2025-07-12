@@ -1,10 +1,10 @@
 ﻿import argparse
 
 from vebp.Command import Command
-from vebp.Command.Add import CommandAdd
-from vebp.Command.Version import CommandVersion
+from vebp.Command.Utils.Add import CommandAdd
+from vebp.Command.Commands.Version import CommandVersion
 
-class CommandCreate:
+class CommandUtilsCreate:
     @staticmethod
     def create() -> argparse.ArgumentParser:
         parser = Command(
@@ -46,5 +46,6 @@ class CommandCreate:
         CommandAdd.add_cwd_command(subparsers)
         CommandAdd.add_help_command(subparsers)
         CommandAdd.add_version_command(subparsers)
+        CommandAdd.add_create_command(subparsers)
 
         return parser

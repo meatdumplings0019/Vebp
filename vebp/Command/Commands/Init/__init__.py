@@ -1,6 +1,6 @@
 ﻿from pathlib import Path
 
-from vebp.Command.Init.create import create
+from vebp.Command.Commands.Init.create import create
 from vebp.Data.BuildConfig import BuildConfig
 from vebp.Data.Config import Config
 from vebp.Data.Pack import Pack
