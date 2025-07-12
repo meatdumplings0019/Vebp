@@ -11,6 +11,7 @@ class VebpData:
     PROP_DICT = {}
 
     def __init__(self, path) -> None:
+        self.path = path
         self.file = self._read(path)
 
     def _read(self, path) -> dict[str, Any]:
@@ -67,3 +68,25 @@ class VebpData:
     @staticmethod
     def default() -> dict[str, Any]:
         return {}
+
+    def write(self, key, value, *keys) -> None:
+        # 构建完整的键路径
+        all_keys = [key] + list(keys)
+        current = self.file
+
+        # 遍历到倒数第二个键（创建必要的嵌套字典）
+        for k in all_keys[:-1]:
+            if k not in current or not isinstance(current[k], dict):
+                current[k] = {}
+            current = current[k]
+
+        # 设置最终键的值
+        last_key = all_keys[-1]
+        current[last_key] = value
+
+        # 写回文件
+        try:
+            f = FileStream(self.path)
+            f.write_json(self.file)
+        except Exception as e:
+            print(f"写入配置文件失败: {e}")

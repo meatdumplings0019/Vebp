@@ -1,2 +1,2 @@
 ﻿"""vebp - Enhanced PyInstaller Packaging Tool"""
-__version__ = "1.0.3"
+__version__ = "1.0.4"

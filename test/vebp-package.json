@@ -1,4 +1,7 @@
 {
-  "name": "Vebp",
-  "venv": ".venv"
+  "name": "test",
+  "venv": ".venv",
+  "script": {
+    "start": "run run.py"
+  }
 }

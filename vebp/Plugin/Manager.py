@@ -1,6 +1,7 @@
 import sys
+import os
 from pathlib import Path
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 
 from vebp.Libs.File import FolderStream, FileStream
 from vebp.Libs.File.modulelib import ModuleLoader
@@ -19,6 +20,8 @@ class PluginManager:
         self.plugins: Dict[str, Plugin] = {}
         # 记录插件包名到路径的映射
         self.package_paths: Dict[str, str] = {}
+        # 记录每个插件添加的依赖路径
+        self.dependency_paths: Dict[str, List[str]] = {}
 
     def load_plugins(self):
         """
@@ -48,6 +51,51 @@ class PluginManager:
         except Exception as e:
             print(f"🔥 解析失败[{plugin_name}]: {str(e)}]")
 
+    def _add_dependencies_to_path(self, plugin_dir: Path, namespace: str):
+        """将插件的依赖目录添加到系统路径"""
+        dependencies_dir = plugin_dir / "dependencies"
+        added_paths = []
+
+        # 检查依赖目录是否存在
+        if dependencies_dir.exists() and dependencies_dir.is_dir():
+            print(f"🔍 为插件 {namespace} 添加依赖路径: {dependencies_dir}")
+
+            # 遍历依赖目录中的所有子目录
+            for item in dependencies_dir.iterdir():
+                if item.is_dir():
+                    # 添加到系统路径
+                    sys.path.insert(0, str(item))
+                    added_paths.append(str(item))
+
+                    # 对于 Windows 系统，将 .libs 目录添加到 PATH
+                    if sys.platform == "win32":
+                        libs_path = item / ".libs"
+                        if libs_path.exists() and libs_path.is_dir():
+                            os.environ["PATH"] = str(libs_path) + os.pathsep + os.environ["PATH"]
+                            added_paths.append(str(libs_path))
+
+            # 保存添加的路径，以便卸载时移除
+            self.dependency_paths[namespace] = added_paths
+
+    def _remove_dependencies_from_path(self, namespace: str):
+        """从系统路径中移除插件的依赖"""
+        if namespace in self.dependency_paths:
+            for path in self.dependency_paths[namespace]:
+                # 从 sys.path 中移除
+                if path in sys.path:
+                    sys.path.remove(path)
+                    print(f"➖ 移除依赖路径: {path}")
+
+                # 对于 Windows 系统，从 PATH 中移除 .libs 目录
+                if sys.platform == "win32" and ".libs" in path:
+                    path_var = os.environ["PATH"]
+                    if path in path_var:
+                        new_path = path_var.replace(path + os.pathsep, "").replace(path, "")
+                        os.environ["PATH"] = new_path
+
+            # 清理记录
+            del self.dependency_paths[namespace]
+
     def _load_single_plugin(self, plugin_path: Path):
         """
         加载单个插件
@@ -72,10 +120,18 @@ class PluginManager:
         if package_name in sys.modules:
             return
 
-        with ModuleLoader(plugin_dir, package_name, "main.py") as module:
-            main_module = module
+        # 添加依赖路径到系统路径
+        self._add_dependencies_to_path(plugin_dir, namespace)
 
-        # 4. 创建并存储 PluginConfig 实例
+        try:
+            with ModuleLoader(plugin_dir, package_name, "main.py") as module:
+                main_module = module
+        except Exception as e:
+            # 加载失败时移除依赖路径
+            self._remove_dependencies_from_path(namespace)
+            raise e
+
+        # 创建并存储 PluginConfig 实例
         plugin = Plugin(
             namespace=namespace,
             author=author,
@@ -142,6 +198,9 @@ class PluginManager:
 
             for module_name in to_remove:
                 del sys.modules[module_name]
+
+            # 移除依赖路径
+            self._remove_dependencies_from_path(namespace)
 
             # 清理插件记录
             del self.plugins[namespace]

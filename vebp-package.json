@@ -2,6 +2,7 @@
   "name": "vebp",
   "venv": ".venv",
   "script": {
-    "build": "run Vebp/run.py build"
+    "build": "run Vebp/run.py build",
+    "start": "run run.py"
   }
 }

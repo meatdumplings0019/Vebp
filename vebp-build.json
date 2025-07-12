@@ -3,7 +3,7 @@
   "console": true,
   "in_assets": [
     {
-      "from": [".gitignore"],
+      "from": ["initContent", "vebp"],
       "to": "."
     }
   ]

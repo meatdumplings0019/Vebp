@@ -19,4 +19,5 @@ class BuildConfig(VebpData):
         "in_assets": {},
         "sub_project": {},
         "exclude_modules": {},
+        "exclude_commands": {}
     }

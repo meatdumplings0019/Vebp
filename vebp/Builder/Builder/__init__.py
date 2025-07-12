@@ -12,6 +12,7 @@ from vebp.Builder import BaseBuilder
 from vebp.Data.BuildConfig import BuildConfig
 from vebp.Data.globals import get_config
 from vebp.Data.Package import Package
+from vebp.Libs.venvs import get_venv_python
 
 
 class Builder(BaseBuilder):
@@ -25,6 +26,7 @@ class Builder(BaseBuilder):
         self._sub = sub
         self._parent_path = parent_path
         self._exclude_modules = []
+        self._exclude_commands = []
 
         self._auto_run = True
 
@@ -115,6 +117,9 @@ class Builder(BaseBuilder):
         auto_run = get_config().get('autoRun', True)
         builder.auto_run = auto_run
 
+        exclude_commands = build_config.get('exclude_commands', [])
+        builder._exclude_commands = exclude_commands
+
         return builder
 
     def set_console(self, console) -> "Builder":
@@ -190,6 +195,7 @@ class Builder(BaseBuilder):
 
                 if source.is_dir():
                     out /= source
+
                 arg = f"{abs_source}{separator}{out}"
                 add_data_args.extend(["--add-data", arg])
 
@@ -319,6 +325,7 @@ class Builder(BaseBuilder):
 
         cmd.extend(self._get_add_data_args())
         cmd.extend(['--name', self.name, str(self.script_path.resolve())])
+        cmd.extend(self._exclude_commands)
 
         return cmd
 
@@ -352,7 +359,7 @@ class Builder(BaseBuilder):
         super().build()
         self._get_path()
 
-        python_path = self._get_venv_python()
+        python_path = get_venv_python(self.venv)
 
         FolderStream(str(self._project_dir)).create()
 

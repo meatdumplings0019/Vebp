@@ -71,21 +71,6 @@ class BaseBuilder(VebpBase):
         if not self.name:
             raise ValueError("项目名称是必需的")
 
-    def _get_venv_python(self) -> Optional[Union[str, Path]]:
-        venv_dir = MPath_.cwd / Path(self.venv)
-
-        if not venv_dir.exists():
-            return None
-
-        if platform.system() == "Windows":
-            python_path = venv_dir / "Scripts" / "python.exe"
-        else:
-            python_path = venv_dir / "bin" / "python"
-
-        if python_path.exists():
-            return python_path
-        return "python.exe"
-
     def build(self) -> None:
         """执行构建过程（由子类实现）"""
         pass

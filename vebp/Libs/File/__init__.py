@@ -181,6 +181,53 @@ class FolderStream:
 
         return file
 
+    def copy_tree(self, destination: Union[str, Path, "FolderStream"]) -> Optional["FolderStream"]:
+        """
+        递归复制当前文件夹及其所有内容到目标路径
+
+        参数:
+            destination: 目标路径(可以是字符串/Path对象/FolderStream对象)
+
+        返回:
+            FolderStream: 复制后的目标文件夹对象
+            None: 如果复制失败
+        """
+        # 获取目标路径的绝对路径
+        dest_abs = FolderStream.abs(destination)
+        if dest_abs is None:
+            return None
+
+        # 确保源文件夹存在
+        if not self.exists:
+            return None
+
+        try:
+            # 创建目标文件夹（如果不存在）
+            os.makedirs(dest_abs, exist_ok=True)
+
+            # 遍历当前文件夹内容
+            dir_info = self.walk()
+            if dir_info is None:
+                return None
+
+            # 复制所有文件
+            for file_stream in dir_info.files:
+                # 构建目标文件路径
+                target_file = os.path.join(dest_abs, file_stream.name)
+                # 复制文件
+                FileStream.copy(file_stream, target_file)
+
+            # 递归复制子文件夹
+            for sub_folder in dir_info.folders:
+                # 构建目标子文件夹路径
+                target_subfolder = os.path.join(dest_abs, os.path.basename(sub_folder.path))
+                sub_folder.copy_tree(target_subfolder)
+
+            return FolderStream(dest_abs)
+        except Exception as e:
+            print(f"复制失败: {str(e)}")
+            return None
+
     def __repr__(self) -> str:
         return f"<FolderStream: {self._path}>"
 

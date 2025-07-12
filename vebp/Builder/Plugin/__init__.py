@@ -1,11 +1,14 @@
 ﻿import json
 import shutil
+import subprocess
 import zipfile
 from pathlib import Path
 from typing import Optional
 
+from vebp.Data.Package import Package
 from vebp.Libs.File import FileStream, FolderStream
 from vebp.Libs.File.path import MPath_
+from vebp.Libs.venvs import get_venv_python
 
 
 class PluginBuilder:
@@ -69,6 +72,111 @@ class PluginBuilder:
                 raise ValueError(f"🔴 vebp-plugin.json 缺少字段: {field}")
 
         return True
+
+    def _resolve_dependencies(self) -> dict[str, Path]:
+        """解析插件依赖，返回依赖包名到安装路径的映射"""
+        # 1. 检查是否有 requirements.txt
+        req_file = self.plugin_path / "requirements.txt"
+        if not req_file.exists():
+            print("📝 未找到 requirements.txt，跳过依赖解析")
+            return {}
+
+        # 2. 读取依赖列表
+        dependencies = []
+        with open(req_file, "r") as f:
+            for line in f:
+                line = line.strip()
+                if line and not line.startswith("#") and "vebp" not in line.lower():
+                    dependencies.append(line.split("==")[0].strip())
+
+        if not dependencies:
+            print("📝 未找到有效依赖")
+            return {}
+
+        print(f"🔍 发现依赖: {', '.join(dependencies)}")
+
+        # 3. 获取当前环境的 site-packages 路径
+        site_packages = self._get_site_packages_path()
+        if not site_packages:
+            print("⚠️ 无法定位 site-packages 目录")
+            return {}
+
+        # 4. 收集依赖包路径
+        dep_map = {}
+        for dep in dependencies:
+            dep_path = self._find_dependency_path(site_packages, dep)
+            if dep_path:
+                dep_map[dep] = dep_path
+                print(f"  ✅ 定位依赖: {dep} -> {dep_path}")
+            else:
+                print(f"  ⚠️ 未找到依赖: {dep}")
+
+        return dep_map
+
+    def _get_site_packages_path(self) -> Optional[Path]:
+        """获取当前环境的 site-packages 路径"""
+        try:
+            # 使用 Python 命令获取 site-packages 路径
+            result = subprocess.run(
+                [get_venv_python(Package(self.plugin_path / Package.FILENAME).get("venv", ".venv")), "-c", "import site; print(site.getsitepackages()[1])"],
+                capture_output=True,
+                text=True,
+                check=True
+            )
+            return Path(result.stdout.strip())
+        except Exception as e:
+            print(f"⚠️ 获取 site-packages 失败: {str(e)}")
+            return None
+
+    @staticmethod
+    def _find_dependency_path(site_packages: Path, package_name: str) -> Optional[Path]:
+        """在 site-packages 中查找依赖包路径"""
+        # 尝试直接匹配包名目录
+        package_dir = site_packages / package_name
+        if package_dir.exists() and package_dir.is_dir():
+            return package_dir
+
+        # 尝试匹配带下划线的包名（如 PyYAML -> _yaml）
+        underscore_name = f"_{package_name.replace('-', '_')}"
+        underscore_dir = site_packages / underscore_name
+        if underscore_dir.exists() and underscore_dir.is_dir():
+            return underscore_dir
+
+        # 尝试匹配 dist-info 获取真实包名
+        for item in site_packages.iterdir():
+            if item.name.startswith(f"{package_name}-") and item.name.endswith(".dist-info"):
+                # 从 dist-info 获取真实包名
+                top_level = item / "top_level.txt"
+                if top_level.exists():
+                    with open(top_level, "r") as f:
+                        real_name = f.readline().strip()
+                    real_dir = site_packages / real_name
+                    if real_dir.exists():
+                        return real_dir
+                    # 尝试带下划线版本
+                    underscore_real = site_packages / f"_{real_name}"
+                    if underscore_real.exists():
+                        return underscore_real
+
+        return None
+
+    @staticmethod
+    def _copy_dependencies(target_dir: Path, dep_map: dict[str, Path]):
+        """复制依赖到 dependencies 文件夹"""
+        deps_dir = target_dir / "dependencies"
+        FolderStream(deps_dir).create()
+
+        for package_name, source_path in dep_map.items():
+            # 复制整个包目录
+            dest_path = deps_dir / package_name
+            shutil.copytree(
+                source_path,
+                dest_path,
+                ignore=shutil.ignore_patterns(
+                    '__pycache__', '*.pyc', '*.pyo', '*.pyd', '*.egg-info'
+                )
+            )
+            print(f"  📦 复制依赖: {package_name}")
 
     def _copy_plugin_files(self, target_dir: Path):
         """复制插件文件到目标目录，排除不需要的文件"""
@@ -172,6 +280,10 @@ class PluginBuilder:
 
         try:
             print(f"🔧 开始构建插件: {self.plugin_name}")
+
+            dep_map = self._resolve_dependencies()
+            if dep_map:
+                self._copy_dependencies(temp_build_dir, dep_map)
 
             # 复制文件到临时目录
             self._copy_plugin_files(temp_build_dir)
